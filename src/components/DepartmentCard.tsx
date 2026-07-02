@@ -7,10 +7,11 @@ import { Badge } from "@/components/ui/badge"
 export function DepartmentCard({ department }: { department: Department }) {
   const navigate = useNavigate()
   const Icon = deptIconMap[department.icon]
+  const destination = department.id === "mis-reporting" ? "/mis" : `/department/${department.id}`
 
   return (
     <button
-      onClick={() => navigate(`/department/${department.id}`)}
+      onClick={() => navigate(destination)}
       className="group relative w-full text-left rounded-xl border border-line bg-surface p-5 pl-6 shadow-[0_1px_2px_rgba(16,24,38,0.04)] transition-all duration-200 hover:-translate-y-0.5 hover:border-primary/30 hover:shadow-[0_12px_24px_-12px_rgba(16,24,38,0.18)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
     >
       <span className="absolute left-0 top-4 bottom-4 w-[3px] rounded-full bg-line-soft group-hover:bg-accent transition-colors duration-200" />
