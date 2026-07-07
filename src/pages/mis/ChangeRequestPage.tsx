@@ -5,7 +5,7 @@ import { useForm } from "react-hook-form"
 import { Shell } from "@/components/Shell"
 import { Button } from "@/components/ui/button"
 import { FormSection } from "@/components/mis/FormSection"
-import { FormField, textareaCls } from "@/components/mis/FormField"
+import { FormField, inputCls, textareaCls } from "@/components/mis/FormField"
 import { TagInput } from "@/components/mis/TagInput"
 import { FileUpload } from "@/components/mis/FileUpload"
 import { RequesterFields } from "@/components/mis/RequesterFields"
@@ -15,6 +15,13 @@ interface FormValues {
   requestedBy: string
   managerName: string
   businessJustification: string
+  metricName?: string
+  metricDefinition?: string
+  metricDataSource?: string
+  metricDisplayFormat?: string
+  currentDefinition?: string
+  newDefinition?: string
+  deletionReason?: string
 }
 
 const changeTypes = [
@@ -41,13 +48,15 @@ const breadcrumb = (
 
 export function ChangeRequestPage() {
   const navigate = useNavigate()
-  const { register, handleSubmit, formState: { errors } } = useForm<FormValues>()
+  const { register, handleSubmit, formState: { errors } } = useForm<FormValues>({ shouldUnregister: true })
 
   const [changeType, setChangeType] = useState("")
   const [models, setModels] = useState<string[]>([])
   const [requestorType, setRequestorType] = useState("")
   const [sampleFiles, setSampleFiles] = useState<File[]>([])
   const [submitted, setSubmitted] = useState(false)
+
+  const displayFormats = ["Number", "Percentage", "Currency", "Decimal/Float", "Text"]
 
   const onSubmit = (_data: FormValues) => setSubmitted(true)
 
@@ -111,6 +120,113 @@ export function ChangeRequestPage() {
                   </button>
                 ))}
               </div>
+            </FormSection>
+
+            <FormSection title="Details" className="transition-all duration-300 ease-in-out">
+              {!changeType && (
+                <div className="rounded-lg border border-dashed border-line bg-surface px-4 py-3 text-sm text-ink-faint">
+                  Select a change type above to enter the required details.
+                </div>
+              )}
+
+              {changeType === "add-metric" && (
+                <div className="space-y-4 animate-[fadeIn_220ms_ease-out]">
+                  <FormField label="Metric Name" required error={errors.metricName?.message}>
+                    <input
+                      {...register("metricName", { required: "Required" })}
+                      className={inputCls}
+                      placeholder="Enter metric name"
+                    />
+                  </FormField>
+
+                  <FormField label="Metric Definition/Formula" required error={errors.metricDefinition?.message}>
+                    <textarea
+                      {...register("metricDefinition", { required: "Required" })}
+                      className={textareaCls}
+                      placeholder="Describe formula or definition"
+                    />
+                  </FormField>
+
+                  <FormField label="Data Source/Field(s) Used" required error={errors.metricDataSource?.message}>
+                    <textarea
+                      {...register("metricDataSource", { required: "Required" })}
+                      className={textareaCls}
+                      placeholder="List source tables, columns, or fields"
+                    />
+                  </FormField>
+
+                  <FormField label="Display Format" required error={errors.metricDisplayFormat?.message}>
+                    <select
+                      {...register("metricDisplayFormat", { required: "Required" })}
+                      className={inputCls}
+                      defaultValue=""
+                    >
+                      <option value="" disabled>
+                        Select format
+                      </option>
+                      {displayFormats.map((format) => (
+                        <option key={format} value={format}>
+                          {format}
+                        </option>
+                      ))}
+                    </select>
+                  </FormField>
+                </div>
+              )}
+
+              {changeType === "change-definition" && (
+                <div className="space-y-4 animate-[fadeIn_220ms_ease-out]">
+                  <FormField label="Metric Name" required error={errors.metricName?.message}>
+                    <input
+                      {...register("metricName", { required: "Required" })}
+                      className={inputCls}
+                      placeholder="Enter metric name"
+                    />
+                  </FormField>
+
+                  <FormField label="Current Definition (for reference)" required error={errors.currentDefinition?.message}>
+                    <textarea
+                      {...register("currentDefinition", { required: "Required" })}
+                      className={textareaCls}
+                      placeholder="Paste or describe current definition"
+                    />
+                  </FormField>
+
+                  <FormField label="New Definition" required error={errors.newDefinition?.message}>
+                    <textarea
+                      {...register("newDefinition", { required: "Required" })}
+                      className={textareaCls}
+                      placeholder="Provide the updated definition"
+                    />
+                  </FormField>
+                </div>
+              )}
+
+              {changeType === "delete-metric" && (
+                <div className="space-y-4 animate-[fadeIn_220ms_ease-out]">
+                  <FormField label="Metric Name" required error={errors.metricName?.message}>
+                    <input
+                      {...register("metricName", { required: "Required" })}
+                      className={inputCls}
+                      placeholder="Enter metric name"
+                    />
+                  </FormField>
+
+                  <FormField label="Reason for Deletion" required error={errors.deletionReason?.message}>
+                    <textarea
+                      {...register("deletionReason", { required: "Required" })}
+                      className={textareaCls}
+                      placeholder="Explain why this metric should be removed"
+                    />
+                  </FormField>
+                </div>
+              )}
+
+              {changeType === "change-view" && (
+                <div className="rounded-lg border border-line bg-line-soft/50 px-4 py-3 text-sm text-ink-soft animate-[fadeIn_220ms_ease-out]">
+                  No additional fields are required for this change type. Please attach a sample output showing the desired report layout.
+                </div>
+              )}
             </FormSection>
 
             <FormSection title="Requester & Approval">
